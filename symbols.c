@@ -7,6 +7,35 @@
 
 #include "symbols.h"
 
+Vector2 *createShevronsVectors(Vector2 center, float radius, size_t scount) {
+    Vector2 *list = (Vector2 *)malloc(scount * sizeof(Vector2));
+    if (list == NULL) return NULL;
+    
+    float d_theta = 2.f * PI / (float)scount;
+
+    for (size_t i = 0; i < scount; i++) {
+
+        float angle = i * d_theta - PI/2;
+        list[i] = (Vector2){center.x + radius * cosf(angle), 
+                            center.y + radius * sinf(angle)};
+
+    }
+    return list;
+}
+
+Symbol *addShevrons(Vector2 center, float radius, size_t scount) {
+    Symbol *slist = (Symbol *)malloc(scount * sizeof(Symbol));
+
+    Vector2 *list = createShevronsVectors(center, radius, scount); 
+    for (int i = 0; i < scount; i ++) {
+        slist[i].pos = list[i];
+        slist[i].n = i;
+    }
+
+    free(list);
+    return slist;
+}
+
 Vector2 *createSymbolsVectors(Vector2 center, float radius, size_t scount) {
     Vector2 *list = (Vector2 *)malloc(scount * sizeof(Vector2));
     if (list == NULL) return NULL;
@@ -14,17 +43,11 @@ Vector2 *createSymbolsVectors(Vector2 center, float radius, size_t scount) {
     float d_theta = 2.f * PI / (float)scount;
 
     for (size_t i = 0; i < scount; i++) {
-        // float angle = i * d_theta;
-        float angle = i * d_theta - PI / 2.0f;
+
+        float angle = i * d_theta ;
         list[i] = (Vector2){center.x + radius * cosf(angle), 
                             center.y + radius * sinf(angle)};
 
-        // float angle = i * d_theta + PI / 2.0f;
-        // printf("ANGLE: %f\n", angle);
-        // list[i] = (Vector2){center.y + radius * sinf(angle) ,
-        //                     center.x + radius * cosf(angle)};
-    
-        
     }
     return list;
 }
@@ -79,14 +102,22 @@ void drawSquareInOrbitAndRotate( Vector2 SCREEN_CENTRE, Symbol *list, int N_SYMB
 void rotateSymbol(RotationHandler *handler, bool *isRotating) {
     if (!(*isRotating)) return;
 
-    if (handler->groupRotationOffset <= handler->maxRotation) {
-        for (int i = 0; i < handler->nSymbols; i++) {
-            float angle = handler->groupRotationOffset + (2 * PI * i / handler->nSymbols);
-            handler->list[i].pos = (Vector2){
-            handler->ScrCenter.x + handler->radius * handler->direction * cosf(angle),
-            handler->ScrCenter.y + handler->radius * sinf(angle)};
-            
-        }
-        handler->groupRotationOffset += 1.0f * GetFrameTime();
+    float tol = 1e-2;
+    if (fabs(handler->groupRotationOffset - handler->maxRotation) < tol) {
+        *isRotating = false;
     }
+
+    handler->groupRotationOffset += 1.0f * GetFrameTime();
+    if (handler->groupRotationOffset > 2 * PI) {
+        handler->groupRotationOffset -= 2 * PI;
+    }
+
+    for (int i = 0; i < handler->nSymbols; i++) {
+        float angle = handler->groupRotationOffset + (2 * PI * i / handler->nSymbols);
+        handler->list[i].pos = (Vector2){
+            handler->ScrCenter.x + handler->radius * cosf(angle),
+            handler->ScrCenter.y + handler->radius * handler->direction* sinf(angle)
+        };
+    }
+
 }

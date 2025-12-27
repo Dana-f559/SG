@@ -26,6 +26,9 @@ typedef struct {
 
 Vector2 *createSymbolsVectors(Vector2 center, float radius, size_t scount);
 
+Vector2 *createShevronsVectors(Vector2 center, float radius, size_t scount);
+
+Symbol *addShevrons(Vector2 center, float radius, size_t scount);
 /**
   * Creates a list of symbols, using the createSymbolsVectors
   * @param center The center of the circle.

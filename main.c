@@ -13,7 +13,7 @@ const Vector2 SCREEN_CENTRE = { .y = (float) SCREEN_HEIGHT / 2.0f, .x = (float) 
 const int N_SYMBOLS = 4;
 const float RADIUS_SIZE = 350.0f;
 
-const int N_SELECT = 9;
+const int N_SELECT = 4;
 
 static const int RIGHT_TURN = 1;
 static const int LEFT_TURN = -1;
@@ -27,23 +27,19 @@ int main(void) {
 
     
     Symbol *list = addSymbols(SCREEN_CENTRE, RADIUS_SIZE, N_SYMBOLS);
-    Symbol *selectList = addSymbols(SCREEN_CENTRE, RADIUS_SIZE + 40, N_SELECT);
+    Symbol *selectList = addShevrons(SCREEN_CENTRE, RADIUS_SIZE + 40, N_SELECT);
 
+    // printf("%f", );
+    // float dialing[7] = {3 * PI/2, };
 
-    printf("X: %f Y: %f\n", list[0].pos.x, list[0].pos.y);
-    
-    float angle = findAngleRadians(list[0].pos, list[1].pos, SCREEN_CENTRE);
-    printf("ANGLE: %f, R:%f\n", angle, PI/2);
     RotationHandler handler;
-    // handler.groupRotationOffset = 1.0;
-    // handler.maxRotation = 1.57079633;
-    handler.groupRotationOffset = -PI/2;
-    
+    // handler.groupRotationOffset = 3 * PI/2;
+    handler.groupRotationOffset = 0;
+    handler.maxRotation = 3 * PI/2;
+    // handler.groupRotationOffset = 1 * PI/2;
+    // handler.maxRotation = 3 * PI/2;
 
-    // handler.maxRotation = PI/2;
-    handler.maxRotation = angle;
-    // handler.maxRotation = 0.0f;
-
+    // float s = -PI/2;
     handler.list = list;
     handler.nSymbols = N_SYMBOLS;
     handler.radius = RADIUS_SIZE;
@@ -51,20 +47,11 @@ int main(void) {
     handler.direction = RIGHT_TURN;
 
     bool isRotating = true;
-    // float nextRotationTarget = some_initial_value;
 
     // ignore
     // size_t d_l[7] = {1, 2, 3, 6, 7, 8, 0};
     // size_t d_s[7] = {1, 2, 3, 4, 5, 6, 7};
     while (!WindowShouldClose()) {
-        if (!isRotating) {
-            float gr = handler.groupRotationOffset;
-            handler.groupRotationOffset = handler.maxRotation;
-            handler.maxRotation = gr;
-
-            isRotating = true;
-
-        }
         rotateSymbol(&handler, &isRotating); 
         
         BeginDrawing();
